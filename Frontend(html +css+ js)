@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Away Order System - Hew Kai Feng</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .author {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .menu-buttons {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .menu-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .food-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .food-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .food-btn:hover {
+            background: #e68900;
+        }
+        
+        .selected-items {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 100px;
+            margin-bottom: 20px;
+        }
+        
+        .item-tag {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            font-size: 14px;
+        }
+        
+        .item-tag .remove {
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .back-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .order-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .topping-selection {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .topping-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .topping-btn:hover {
+            background: #1976d2;
+        }
+        
+        .price-display {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .note {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍕 Take Away Order Management System 🍝</h1>
+        <div class="author">@author Hew Kai Feng - ver 1.3.3</div>
+        
+        <!-- Main Menu -->
+        <div id="mainMenu">
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="showSection('orderForm')">
+                    📝 1. Enter Customer Order
+                </button>
+                <button class="menu-btn" onclick="showSection('deliverOrder')">
+                    🚚 2. Deliver an Order
+                </button>
+                <button class="menu-btn" onclick="showSection('displayOrders')">
+                    📋 3. Display Order Details
+                </button>
+                <button class="menu-btn" onclick="alert('Goodbye! Please come again.'); window.close();">
+                    🚪 4. Exit
+                </button>
+                <button class="menu-btn" onclick="showSection('removeOrder')">
+                    ❌ 5. Remove Order
+                </button>
+                <button class="menu-btn" onclick="showSection('searchOrder')">
+                    🔍 6. Search Order
+                </button>
+                <button class="menu-btn" onclick="showSection('updateOrder')">
+                    ✏️ 7. Update Order
+                </button>
+            </div>
+            <div class="note">* You can select option 3 to view your order number</div>
+        </div>
+
+        <!-- Order Form Section -->
+        <div id="orderForm" class="section">
+            <h2>📝 Enter Customer Order</h2>
+            <form id="customerOrderForm">
+                <div class="form-group">
+                    <label for="customerName">Customer Name (letters only):</label>
+                    <input type="text" id="customerName" required>
+                    <div id="nameError" class="error" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number (8-15 digits):</label>
+                    <input type="text" id="contactNumber" required>
+                    <div id="contactError" class="error" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="homeAddress">Home Address (minimum 5 characters):</label>
+                    <textarea id="homeAddress" required></textarea>
+                    <div id="addressError" class="error" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Food Items (pizza/pasta, click 'Done' when finished):</label>
+                    <div class="food-buttons">
+                        <button type="button" class="food-btn" onclick="addPizza()">🍕 Add Pizza</button>
+                        <button type="button" class="food-btn" onclick="addPasta()">🍝 Add Pasta</button>
+                        <button type="button" class="food-btn" onclick="finishOrdering()" style="background: #28a745;">✅ Done</button>
+                    </div>
+                    <div id="selectedItems" class="selected-items">
+                        <p>No items selected yet. Note: If you don't add any toppings, it will be assumed as vegan meal.</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Place Order</button>
+                <button type="button" class="back-btn" onclick="showMainMenu()">Back</button>
+            </form>
+        </div>
+
+        <!-- Display Orders Section -->
+        <div id="displayOrders" class="section">
+            <h2>📋 Pending Orders</h2>
+            <div id="ordersList"></div>
+            <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+        </div>
+
+        <!-- Search Order Section -->
+        <div id="searchOrder" class="section">
+            <h2>🔍 Search Order</h2>
+            <form id="searchForm">
+                <div class="form-group">
+                    <label for="searchName">Customer Name (letters only):</label>
+                    <input type="text" id="searchName" required>
+                </div>
+                <div class="form-group">
+                    <label for="searchContact">Contact Number (digits only):</label>
+                    <input type="text" id="searchContact" required>
+                </div>
+                <div class="form-group">
+                    <label for="searchAddress">Delivery Address:</label>
+                    <input type="text" id="searchAddress" required>
+                </div>
+                <button type="submit" class="submit-btn">Search</button>
+                <button type="button" class="back-btn" onclick="showMainMenu()">Back</button>
+            </form>
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- Update Order Section -->
+        <div id="updateOrder" class="section">
+            <h2>✏️ Update Order</h2>
+            <div class="form-group">
+                <label for="updateOrderSelect">Select Order to Update:</label>
+                <select id="updateOrderSelect" onchange="loadOrderForUpdate()">
+                    <option value="">Select an order...</option>
+                </select>
+            </div>
+            <div id="updateForm" style="display: none;">
+                <div id="currentOrderDisplay" class="order-card"></div>
+                <div class="form-group">
+                    <label>What do you want to update?</label>
+                    <div class="food-buttons">
+                        <button type="button" class="food-btn" onclick="updateField('name')">1. Customer Name</button>
+                        <button type="button" class="food-btn" onclick="updateField('contact')">2. Contact Number</button>
+                        <button type="button" class="food-btn" onclick="updateField('address')">3. Delivery Address</button>
+                    </div>
+                </div>
+                <div id="updateFieldForm" style="display: none;">
+                    <div class="form-group">
+                        <label id="updateFieldLabel">Update Field:</label>
+                        <input type="text" id="updateFieldValue" required>
+                        <textarea id="updateFieldValueArea" style="display: none;"></textarea>
+                    </div>
+                    <button onclick="saveUpdate()" class="submit-btn">Update</button>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showMainMenu()">Back</button>
+        </div>
+
+        <!-- Deliver Order Section -->
+        <div id="deliverOrder" class="section">
+            <h2>🚚 Deliver Order (First In First Out)</h2>
+            <div id="deliveryInfo"></div>
+            <button onclick="deliverFirstOrder()" class="submit-btn">Deliver Next Order</button>
+            <button class="back-btn" onclick="showMainMenu()">Back</button>
+        </div>
+
+        <!-- Remove Order Section -->
+        <div id="removeOrder" class="section">
+            <h2>❌ Remove Order</h2>
+            <div class="form-group">
+                <label for="removeOrderSelect">Select Order to Remove:</label>
+                <select id="removeOrderSelect" onchange="showOrderToRemove()">
+                    <option value="">Select an order...</option>
+                </select>
+            </div>
+            <div id="orderToRemoveDisplay" style="display: none;">
+                <div id="orderToRemoveInfo" class="order-card"></div>
+                <p><strong>Are you sure you want to remove this order?</strong></p>
+                <button onclick="confirmRemoveOrder()" class="submit-btn" style="background: #dc3545;">Yes, Remove</button>
+                <button onclick="cancelRemoveOrder()" class="submit-btn" style="background: #6c757d;">No, Cancel</button>
+            </div>
+            <button class="back-btn" onclick="showMainMenu()">Back</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables - matching Java structure
+        let orders = [];
+        let orderCounter = 1;
+        let currentOrderItems = [];
+        let currentOrderDone = false;
+        let currentUpdateOrderId = null;
+        let currentUpdateField = null;
+
+        // Validation functions - exactly like Java
+        function isValidName(name) {
+            return /^[a-zA-Z\s'-]+$/.test(name.trim()) && name.trim().length > 0;
+        }
+
+        function isValidContactNumber(contact) {
+            const cleanContact = contact.replace(/\s+/g, '');
+            return /^\d{8,15}$/.test(cleanContact);
+        }
+
+        function isValidAddress(address) {
+            return address.trim().length >= 5;
+        }
+
+        // Pizza and Pasta classes simulation
+        class FoodItem {
+            constructor() {
+                this.BASE_PRICE = 11.50;
+                this.price = this.BASE_PRICE;
+            }
+        }
+
+        class Pizza extends FoodItem {
+            constructor() {
+                super();
+                this.toppings = [];
+                this.foodType = 'PIZZA';
+            }
+
+            createToppingPizza() {
+                const toppings = ['HAM', 'CHEESE', 'PINEAPPLE', 'MUSHROOMS', 'TOMATO', 'SEAFOOD'];
+                const prices = { HAM: 2.00, CHEESE: 2.00, PINEAPPLE: 2.50, MUSHROOMS: 2.00, TOMATO: 2.00, SEAFOOD: 3.50 };
+                
+                return new Promise((resolve) => {
+                    const toppingDiv = document.createElement('div');
+                    toppingDiv.className = 'topping-selection';
+                    toppingDiv.innerHTML = `
+                        <p><strong>Available pizza toppings:</strong> ham, cheese, pineapple, mushrooms, tomato, seafood</p>
+                        <p>Click toppings to add (each topping costs extra):</p>
+                        <div>
+                            ${toppings.map(topping => `
+                                <button class="topping-btn" onclick="addPizzaTopping('${topping}', ${prices[topping]}, this)">
+                                    ${topping} +$${prices[topping].toFixed(2)}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="price-display">
+                            <p>Base price: $${this.BASE_PRICE.toFixed(2)}</p>
+                            <p id="pizzaTotalPrice">Total: $${this.BASE_PRICE.toFixed(2)}</p>
+                        </div>
+                        <button class="submit-btn" onclick="finishPizzaTopping()">Done Adding Toppings</button>
+                    `;
+                    
+                    document.getElementById('selectedItems').appendChild(toppingDiv);
+                    
+                    window.currentPizza = this;
+                    window.resolvePizza = resolve;
+                });
+            }
+
+            getMealType() {
+                if (this.toppings.length === 0) return 'VEGAN';
+                if (this.toppings.includes('HAM') || this.toppings.includes('SEAFOOD')) return 'MEAT';
+                if (this.toppings.includes('CHEESE')) return 'VEGETARIAN';
+                return 'VEGAN';
+            }
+        }
+
+        class Pasta extends FoodItem {
+            constructor() {
+                super();
+                this.toppings = [];
+                this.foodType = 'PASTA';
+                this.mealType = 'VEGAN';
+            }
+
+            createToppingPasta() {
+                const toppings = ['BOLOGNESE', 'MARINARA', 'PRIMAVERA', 'TOMATO'];
+                const prices = { BOLOGNESE: 5.20, MARINARA: 6.80, PRIMAVERA: 5.20, TOMATO: 4.00 };
+                const mealTypes = { BOLOGNESE: 'MEAT', MARINARA: 'MEAT', PRIMAVERA: 'VEGETARIAN', TOMATO: 'VEGAN' };
+                
+                return new Promise((resolve) => {
+                    const toppingDiv = document.createElement('div');
+                    toppingDiv.className = 'topping-selection';
+                    toppingDiv.innerHTML = `
+                        <p><strong>Available pasta toppings:</strong> bolognese, marinara, primavera, tomato</p>
+                        <p>Select only ONE topping for pasta:</p>
+                        <div>
+                            ${toppings.map(topping => `
+                                <button class="topping-btn" onclick="addPastaTopping('${topping}', ${prices[topping]}, '${mealTypes[topping]}')">
+                                    ${topping} +$${prices[topping].toFixed(2)}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="price-display">
+                            <p>Base price: $${this.BASE_PRICE.toFixed(2)}</p>
+                            <p id="pastaTotalPrice">Total: $${this.BASE_PRICE.toFixed(2)}</p>
+                        </div>
+                        <button class="submit-btn" onclick="finishPastaTopping()">No Topping (Vegan)</button>
+                    `;
+                    
+                    document.getElementById('selectedItems').appendChild(toppingDiv);
+                    
+                    window.currentPasta = this;
+                    window.resolvePasta = resolve;
+                });
+            }
+
+            getMealType() {
+                return this.mealType;
+            }
+        }
+
+        // Pizza topping functions
+        function addPizzaTopping(topping, price, button) {
+            const pizza = window.currentPizza;
+            if (!pizza.toppings.includes(topping)) {
+                pizza.toppings.push(topping);
+                pizza.price += price;
+                button.style.backgroundColor = '#28a745';
+                button.textContent = `${topping} ✓ +$${price.toFixed(2)}`;
+                document.getElementById('pizzaTotalPrice').textContent = `Total: $${pizza.price.toFixed(2)}`;
+            }
+        }
+
+        function finishPizzaTopping() {
+            const pizza = window.currentPizza;
+            pizza.toppings.length > 0 ? 
+                console.log(`Total ${pizza.toppings.length} toppings added.`) : 
+                console.log('No toppings added.');
+            
+            document.querySelector('.topping-selection').remove();
+            window.resolvePizza(pizza);
+        }
+
+        // Pasta topping functions
+        function addPastaTopping(topping, price, mealType) {
+            const pasta = window.currentPasta;
+            pasta.toppings = [topping];
+            pasta.price += price;
+            pasta.mealType = mealType;
+            document.getElementById('pastaTotalPrice').textContent = `Total: $${pasta.price.toFixed(2)}`;
+            
+            // Disable other buttons
+            document.querySelectorAll('.topping-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.backgroundColor = '#6c757d';
+            });
+            
+            // Highlight selected
+            event.target.style.backgroundColor = '#28a745';
+            event.target.textContent = `${topping} ✓ +$${price.toFixed(2)}`;
+            
+            setTimeout(() => finishPastaTopping(), 1000);
+        }
+
+        function finishPastaTopping() {
+            const pasta = window.currentPasta;
+            pasta.toppings.length > 0 ? 
+                console.log(`Total ${pasta.toppings.length} toppings added.`) : 
+                console.log('No toppings added.');
+            
+            document.querySelector('.topping-selection').remove();
+            window.resolvePasta(pasta);
+        }
+
+        // Show/Hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'updateOrder' || sectionId === 'deliverOrder' || sectionId === 'removeOrder') {
+                updateOrderDropdowns();
+            }
+            if (sectionId === 'displayOrders') {
+                displayAllOrders();
+            }
+            if (sectionId === 'deliverOrder') {
+                showDeliveryInfo();
+            }
+        }
+
+        function showMainMenu() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('mainMenu').style.display = 'block';
+            clearAllForms();
+        }
+
+        function clearAllForms() {
+            currentOrderItems = [];
+            currentOrderDone = false;
+            document.getElementById('customerOrderForm').reset();
+            document.getElementById('searchForm').reset();
+            document.getElementById('selectedItems').innerHTML = '<p>No items selected yet. Note: If you don\'t add any toppings, it will be assumed as vegan meal.</p>';
+            clearErrorMessages();
+        }
+
+        function clearErrorMessages() {
+            document.querySelectorAll('.error').forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+
+        // Food item functions
+        async function addPizza() {
+            const pizza = new Pizza();
+            await pizza.createToppingPizza();
+            currentOrderItems.push(pizza);
+            updateSelectedItemsDisplay();
+        }
+
+        async function addPasta() {
+            const pasta = new Pasta();
+            await pasta.createToppingPasta();
+            currentOrderItems.push(pasta);
+            updateSelectedItemsDisplay();
+        }
+
+        function finishOrdering() {
+            currentOrderDone = true;
+            if (currentOrderItems.length === 0) {
+                alert('Please add at least one food item before finishing.');
+                return;
+            }
+            alert('Food selection completed! Now fill in your details and place the order.');
+        }
+
+        function updateSelectedItemsDisplay() {
+            const container = document.getElementById('selectedItems');
+            
+            if (currentOrderItems.length === 0) {
+                container.innerHTML = '<p>No items selected yet. Note: If you don\'t add any toppings, it will be assumed as vegan meal.</p>';
+                return;
+            }
+            
+            let html = '<h4>Selected Items:</h4>';
+            currentOrderItems.forEach((item, index) => {
+                const toppingsList = item.toppings.length > 0 ? 
+                    `toppings: [${item.toppings.join(', ')}]` : 
+                    'no topping';
+                html += `
+                    <div class="item-tag">
+                        ${item.foodType}: ${toppingsList}, price=$${item.price.toFixed(2)} (Meal Type: ${item.getMealType()})
+                        <span class="remove" onclick="removeItem(${index})">×</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function removeItem(index) {
+            currentOrderItems.splice(index, 1);
+            updateSelectedItemsDisplay();
+        }
+
+        // Order management
+        document.getElementById('customerOrderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('customerName').value.trim();
+            const contact = document.getElementById('contactNumber').value.trim();
+            const address = document.getElementById('homeAddress').value.trim();
+            
+            clearErrorMessages();
+            let isValid = true;
+            
+            if (!isValidName(name)) {
+                document.getElementById('nameError').textContent = 'Invalid name! Name should contain only letters, spaces, hyphens, and apostrophes. No digits allowed.';
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValidContactNumber(contact)) {
+                document.getElementById('contactError').textContent = 'Invalid contact number! Please enter 8-15 digits only (spaces allowed).';
+                document.getElementById('contactError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValidAddress(address)) {
+                document.getElementById('addressError').textContent = 'Address too short! Please enter a complete address (minimum 5 characters).';
+                document.getElementById('addressError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (currentOrderItems.length === 0) {
+                alert('Order must have at least one food item.');
+                isValid = false;
+            }
+            
+            if (isValid) {
+                const pizzaCount = currentOrderItems.filter(item => item.foodType === 'PIZZA').length;
+                const pastaCount = currentOrderItems.filter(item => item.foodType === 'PASTA').length;
+                
+                const order = {
+                    id: orderCounter++,
+                    customerName: name,
+                    contactNumber: contact,
+                    address: address,
+                    items: [...currentOrderItems],
+                    orderDate: new Date().toLocaleString()
+                };
+                
+                orders.push(order);
+                
+                alert(`(Mr/Miss) ${name} ordered ${pizzaCount} pizza(s) and ${pastaCount} pasta(s).\n\nOrder(s) added!\nOrder ID: ${order.id}`);
+                showMainMenu();
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const searchName = document.getElementById('searchName').value.trim();
+            const searchContact = document.getElementById('searchContact').value.trim();
+            const searchAddress = document.getElementById('searchAddress').value.trim();
+            
+            // Validate search inputs
+            if (!isValidName(searchName)) {
+                alert('Invalid name! Name should contain only letters, spaces, hyphens, and apostrophes. No digits allowed.');
+                return;
+            }
+            
+            if (!isValidContactNumber(searchContact)) {
+                alert('Invalid contact number! Please enter 8-15 digits only.');
+                return;
+            }
+            
+            if (!isValidAddress(searchAddress)) {
+                alert('Address too short! Please enter a complete address.');
+                return;
+            }
+            
+            const foundOrder = orders.find(order => 
+                order.customerName.toLowerCase() === searchName.toLowerCase() &&
+                order.contactNumber === searchContact &&
+                order.address.toLowerCase() === searchAddress.toLowerCase()
+            );
+            
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (foundOrder) {
+                resultsDiv.innerHTML = `
+                    <div class="success">
+                        <h3>This is your order</h3>
+                        ${formatOrderDisplay(foundOrder)}
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <h3>No such order exists or user info is wrong</h3>
+                    </div>
+                `;
+            }
+        });
+
+        // Display all orders
+        function displayAllOrders() {
+            const container = document.getElementById('ordersList');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p>No pending orders.</p>';
+                return;
+            }
+            
+            container.innerHTML = '<h3>Pending orders:</h3>';
+            orders.forEach((order, index) => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-card';
+                orderDiv.innerHTML = `
+                    <h4>Order(${index + 1})</h4>
+                    <p><strong>Your order number (don't forget it): ${index + 1}</strong></p>
+                    ${formatOrderDisplay(order)}
+                `;
+                container.appendChild(orderDiv);
+            });
+        }
+
+        function formatOrderDisplay(order) {
+            let totalPrice = 0;
+            let itemsList = '';
+            
+            order.items.forEach(item => {
+                totalPrice += item.price;
+                const toppingsList = item.toppings.length > 0 ? 
+                    `toppings: [${item.toppings.join(', ')}]` : 
+                    'no topping';
+                itemsList += `<br>&nbsp;&nbsp;${item.foodType}: ${toppingsList}, price=$${item.price.toFixed(2)} (Meal Type: ${item.getMealType()})`;
+            });
+            
+            return `
+                <p><strong>Customer's name:</strong> ${order.customerName}</p>
+                <p><strong>Customer's contact number:</strong> ${order.contactNumber}</p>
+                <p><strong>Customer's home address:</strong> ${order.address}</p>
+                <p><strong>Total order cost:</strong> $${totalPrice.toFixed(2)}</p>
+                <p><strong>Food items:</strong>${itemsList}</p>
+                <p><strong>Order Date:</strong> ${order.orderDate}</p>
+            `;
+        }
+
+        // Update order functionality
+        function updateOrderDropdowns() {
+            const updateDropdown = document.getElementById('updateOrderSelect');
+            const removeDropdown = document.getElementById('removeOrderSelect');
+            
+            [updateDropdown, removeDropdown].forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select an order...</option>';
+                orders.forEach((order, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `Order ${index + 1} - ${order.customerName}`;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        function loadOrderForUpdate() {
+            const orderIndex = document.getElementById('updateOrderSelect').value;
+            const updateForm = document.getElementById('updateForm');
+            
+            if (orderIndex !== '') {
+                const order = orders[orderIndex];
+                currentUpdateOrderId = orderIndex;
+                document.getElementById('currentOrderDisplay').innerHTML = `
+                    <h4>Below is your order</h4>
+                    ${formatOrderDisplay(order)}
+                `;
+                updateForm.style.display = 'block';
+            } else {
+                updateForm.style.display = 'none';
+            }
+        }
+
+        function updateField(fieldType) {
+            currentUpdateField = fieldType;
+            const updateFieldForm = document.getElementById('updateFieldForm');
+            const updateFieldLabel = document.getElementById('updateFieldLabel');
+            const updateFieldValue = document.getElementById('updateFieldValue');
+            const updateFieldValueArea = document.getElementById('updateFieldValueArea');
+            
+            const order = orders[currentUpdateOrderId];
+            
+            updateFieldValue.style.display = 'block';
+            updateFieldValueArea.style.display = 'none';
+            
+            switch(fieldType) {
+                case 'name':
+                    updateFieldLabel.textContent = 'Enter updated customer name (letters only):';
+                    updateFieldValue.value = order.customerName;
+                    break;
+                case 'contact':
+                    updateFieldLabel.textContent = 'Enter updated contact number (8-15 digits):';
+                    updateFieldValue.value = order.contactNumber;
+                    break;
+                case 'address':
+                    updateFieldLabel.textContent = 'Enter updated delivery address:';
+                    updateFieldValue.style.display = 'none';
+                    updateFieldValueArea.style.display = 'block';
+                    updateFieldValueArea.value = order.address;
+                    break;
+            }
+            
+            updateFieldForm.style.display = 'block';
+        }
+
+        function saveUpdate() {
+            const order = orders[currentUpdateOrderId];
+            let newValue = currentUpdateField === 'address' ? 
+                document.getElementById('updateFieldValueArea').value.trim() : 
+                document.getElementById('updateFieldValue').value.trim();
+            
+            // Validate input
+            if (currentUpdateField === 'name' && !isValidName(newValue)) {
+                alert('Invalid name! Name should contain only letters, spaces, hyphens, and apostrophes.');
+                return;
+            }
+            
+            if (currentUpdateField === 'contact' && !isValidContactNumber(newValue)) {
+                alert('Invalid contact number! Please enter 8-15 digits only.');
+                return;
+            }
+            
+            if (currentUpdateField === 'address' && !isValidAddress(newValue)) {
+                alert('Address too short! Please enter a complete address.');
+                return;
+            }
+            
+            // Update the order
+            switch(currentUpdateField) {
+                case 'name':
+                    order.customerName = newValue;
+                    alert('System already updated your name!');
+                    break;
+                case 'contact':
+                    order.contactNumber = newValue;
+                    alert('System already updated your contact number!');
+                    break;
+                case 'address':
+                    order.address = newValue;
+                    alert('System already updated your address!');
+                    break;
+            }
+            
+            // Show updated order
+            document.getElementById('currentOrderDisplay').innerHTML = `
+                <h4>Below is the full info with updated details</h4>
+                ${formatOrderDisplay(order)}
+            `;
+            
+            document.getElementById('updateFieldForm').style.display = 'none';
+        }
+
+        // Delivery functionality (FIFO)
+        function showDeliveryInfo() {
+            const container = document.getElementById('deliveryInfo');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p>So far no orders to deliver.</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="order-card">
+                    <h4>Next Order to Deliver (First In First Out):</h4>
+                    ${formatOrderDisplay(orders[0])}
+                </div>
+            `;
+        }
+
+        function deliverFirstOrder() {
+            if (orders.length === 0) {
+                alert('So far no orders to deliver.');
+                return;
+            }
+            
+            const orderToDeliver = orders.shift(); // Remove first order (FIFO)
+            const deliveryTime = new Date().toLocaleString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            alert(`Delivering........\n\n${formatOrderDisplay(orderToDeliver).replace(/<[^>]*>/g, '')}\n\nDelivered on: ${deliveryTime}`);
+            
+            // Show next order if available
+            if (orders.length > 0) {
+                document.getElementById('deliveryInfo').innerHTML = `
+                    <div class="success">
+                        <h4>Order delivered successfully!</h4>
+                        <p>Delivered on: ${deliveryTime}</p>
+                    </div>
+                    <div class="order-card">
+                        <h4>Next order to be delivered:</h4>
+                        ${formatOrderDisplay(orders[0])}
+                    </div>
+                `;
+            } else {
+                document.getElementById('deliveryInfo').innerHTML = '<div class="success"><h4>All orders have been delivered!</h4></div>';
+            }
+        }
+
+        // Remove order functionality
+        function showOrderToRemove() {
+            const orderIndex = document.getElementById('removeOrderSelect').value;
+            const displayDiv = document.getElementById('orderToRemoveDisplay');
+            
+            if (orderIndex !== '') {
+                const order = orders[orderIndex];
+                document.getElementById('orderToRemoveInfo').innerHTML = `
+                    <h4>The order you want to remove</h4>
+                    ${formatOrderDisplay(order)}
+                `;
+                displayDiv.style.display = 'block';
+            } else {
+                displayDiv.style.display = 'none';
+            }
+        }
+
+        function confirmRemoveOrder() {
+            const orderIndex = document.getElementById('removeOrderSelect').value;
+            if (orderIndex !== '') {
+                const removedOrder = orders.splice(orderIndex, 1)[0];
+                alert(`Removing order........\n\n${formatOrderDisplay(removedOrder).replace(/<[^>]*>/g, '')}`);
+                showMainMenu();
+            }
+        }
+
+        function cancelRemoveOrder() {
+            alert('Order not removed');
+            document.getElementById('orderToRemoveDisplay').style.display = 'none';
+            document.getElementById('removeOrderSelect').value = '';
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            showMainMenu();
+        });
+    </script>
+</body>
+</html>
